@@ -10,11 +10,67 @@ import java.io.*;
 
 /**
  *
- * @author visitante
+ * @author lucaspauloop
  */
+
+class Codificacao{
+    private String op;
+    private String num1, num2;
+    private String code;
+    
+   Codificacao(String op, String num1, String num2) {
+       this.op = op;
+       this.num1 = num1;
+       this.num2 = num2;
+   }
+   
+  public String constroiCode() {
+      String code = "CALC0012";
+      this.num1 = this.preencheNum(this.num1);
+      this.num2 = this.preencheNum(this.num2);
+      
+      this.SelecionaOperacao();
+      
+      this.setCode(code + this.num1 + this.num2 + this.op);
+      return this.code;
+  }
+  
+  private void SelecionaOperacao() {
+     switch(this.op) {
+         case "1":
+             this.op = "SUM";
+         break;
+         case "2":
+             this.op = "SUB";
+         break;
+         case "3":
+             this.op = "DIV";
+         break;
+         case "4":
+             this.op = "MULT";
+         break;
+         case "5":
+             this.op = "RAIZ";
+         break;
+     }
+  }
+  
+  private String preencheNum(String num) {
+      while(num.length() < 4) {
+          num = '0' + num;
+      }
+
+      return num;
+  }
+  
+  private void setCode(String code) {
+      this.code = code;
+  }
+}
+
 public class cliente {
     public static void main(String args[]){
-		String cad1,cad2,cad3;
+		String num1, num2, operacao;
 		String resultado = "";
 		String url = "localhost";
 		int port = 4800;
@@ -29,25 +85,30 @@ public class cliente {
 			DataInputStream dis = new DataInputStream(is);
 
 			System.out.println("Qual o tipo de operação: ");
-			System.out.println("1)Soma 2)Subtração 3)Multiplicação 4)Divisão");
-			cad3 = bf.readLine();
-			dos1.writeUTF(cad3);
+			System.out.println("1)Soma \n2)Subtração \n3)Multiplicação \n4)Divisão \n5) Raiz");
+			operacao = bf.readLine();
 
-			System.out.println("Enviar primeiro número : ");
-			cad1 = bf.readLine();
-			dos1.writeUTF(cad1);
+			System.out.println("Enviar um número : ");
+			num1 = bf.readLine();
+                        
+                        if (!operacao.equals("5")) {
+                            System.out.println("Enviar um número: ");
+                            num2 = bf.readLine();
+                        } else {
+                            num2 = num1;
+                        }
+                        
+                
+                        Codificacao codific = new Codificacao(operacao, num1, num2);
+                        dos1.writeUTF(codific.constroiCode());
 
-			System.out.println("Enviar segundo número: ");
-			cad1 = bf.readLine();
-			dos1.writeUTF(cad1);
-
-			resultado = dis.readUTF();
+                        resultado = dis.readUTF();
 			System.out.println("O resultado é: " + resultado);
 
 			dos1.flush();	
 			dos1.close();
 		}
-		catch(IOException e){	
+		catch(IOException e) {
 			System.out.println("ERROR: não encontro servidor");
 		}
 	}
