@@ -91,6 +91,10 @@ public class cliente {
 			System.out.println("Enviar um número : ");
 			num1 = bf.readLine();
                         
+                        int verificarn1 = Integer.parseInt(num1);
+                        
+                        if (verificarn1 < 0) num1 = Integer.toString(verificarn1 * -1);
+                        
                         if (!operacao.equals("5")) {
                             System.out.println("Enviar um número: ");
                             num2 = bf.readLine();
@@ -103,7 +107,7 @@ public class cliente {
                         dos1.writeUTF(codific.constroiCode());
 
                         resultado = dis.readUTF();
-			System.out.println("O resultado é: " + resultado);
+			System.out.println("O resultado é: " + resultado.substring(8, 12));
 
 			dos1.flush();	
 			dos1.close();
