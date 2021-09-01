@@ -49,6 +49,50 @@ class Decodificacao {
 }
 
 
+
+class Encrypt {
+    Encrypt() {}
+    
+    String realizarCalculo(Double num1, Double num2, String operacao) {
+       Double resultado = 0.0;
+        
+        switch(operacao) {
+               case "SUM":
+                   resultado = num1 + num2;	
+               break;
+               case "SUB":
+                   resultado = num1 - num2;
+               case "MULT":
+                   resultado = num1 * num2;
+               break;
+               case "DIV":
+                   resultado = num1 / num2;
+               break;
+               case "RAIZ":
+                   resultado = Math.sqrt(num1);
+               break;
+           }
+        
+        return this.encryptResultado((int)Math.round(resultado));
+    }
+    
+    String encryptResultado(int resultado) {
+        String code = preencheNum(resultado);
+        
+        return "RESP0004" + code;
+    }
+    
+    private String preencheNum(int num) {
+       String string = Integer.toString(num);
+        
+      while(string.length() < 4) {
+          string = '0' + string;
+      }
+
+      return string;
+    }
+}
+
 public class server {
 
     /**
@@ -61,6 +105,7 @@ public class server {
        String string1, string2, string3, operacao, codificacao;
        ServerSocket serverSocket = null;
        String url = "localhost";
+       String sistema;
        
        try {
            serverSocket = new ServerSocket(port);
@@ -83,31 +128,26 @@ public class server {
            operacao = decodificacao.getOperacao();
            string1 = decodificacao.getNum1();
            string2 = decodificacao.getNum2();
+           sistema = decodificacao.getSistema();
            System.out.println("Operação escolhida foi " + operacao);
            num1 = Double.parseDouble(string1);
            num2 = Double.parseDouble(string2);
            
-           switch(operacao) {
-               case "SUM":
-                   resultado = num1 + num2;	
-               break;
-               case "SUB":
-                   resultado = num1 - num2;
-               case "MULT":
-                   resultado = num1 * num2;
-               break;
-               case "DIV":
-                   resultado = num1 / num2;
-               break;
-               case "RAIZ":
-                   resultado = Math.sqrt(num1);
-               break;
+           if (!sistema.equals("CALC")) {
+            dos1.writeUTF("-1");
+            server1.close();
+            dis.close();
+           } else if (operacao.equals("DIV") && num2 == 0) {
+            dos1.writeUTF("XXXX");
+            server1.close();
+            dis.close();
+           } else {
+             Encrypt encrypt = new Encrypt();
+             String code = encrypt.realizarCalculo(num1, num2, operacao);
+             dos1.writeUTF(code);
+             server1.close();
+             dis.close();
            }
-            
-           dos1.writeUTF(Double.toString(resultado));
-           
-           server1.close();
-           dis.close();
            
        } catch (IOException e) {
            System.out.println(e);
